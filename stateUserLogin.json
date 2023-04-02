@@ -1,0 +1,3 @@
+{
+  "how-to-login": "กรุณากรอกข้อมูลการลงชื่อเข้าใช้ด้วยวิธีดังนี้\n login ${email} ${password}\n ตัวอย่างเช่น: login admin@rairubraijia 123456"
+}

@@ -7,6 +7,7 @@ import (
 	"example/line-bot-ledger/model"
 	"example/line-bot-ledger/responses"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -123,4 +124,26 @@ func ReplyMessageLine(Message model.ReplyMessage) error {
 	// log.Println("response Body:", string(body))
 
 	return err
+}
+
+func ConvertFileToJson(jsonFile *os.File) (model.StateUser, error) {
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	var data model.StateUser
+	json.Unmarshal(byteValue, &data)
+
+	return data, nil
+}
+
+func ConvertInterfaceToStruct(data interface{}, result interface{}) error {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(jsonData, result)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
