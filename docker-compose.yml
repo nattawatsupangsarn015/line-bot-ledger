@@ -1,0 +1,29 @@
+version: "2"
+
+services:
+  backend_ledger:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - ../line-bot-ledger:/go/src/go-with-compose
+    working_dir: /go/src/go-with-compose
+    ports:
+      - "3000:3000"
+    environment:
+      - CONNECTION_DB=mongodb://mongodb_ledger:27017
+    env_file:
+      - .env
+    depends_on:
+      - mongodb_ledger
+  mongodb_ledger:
+    image: mongo:latest
+    container_name: "mongodb_ledger"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - "27019:27017"
+    command: mongod  --logpath=/dev/null #
