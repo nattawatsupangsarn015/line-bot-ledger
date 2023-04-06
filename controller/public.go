@@ -5,6 +5,7 @@ import (
 	"example/line-bot-ledger/config"
 	"example/line-bot-ledger/model"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -55,7 +56,14 @@ func GetUserByLineId(lineId string) (interface{}, error) {
 
 func UpdateLineIdUser(email string, lineId string) error {
 	filter := bson.M{"email": email}
-	update := bson.M{"$set": bson.M{"isLogin": true, "lineId": lineId}}
+	update := bson.M{"$set": bson.M{"isLogin": true, "lineId": lineId, "updated_at": time.Now()}}
+	UserCollection.FindOneAndUpdate(context.TODO(), filter, update)
+	return nil
+}
+
+func UpdateLogoutUser(lineId string) error {
+	filter := bson.M{"lineId": lineId}
+	update := bson.M{"$set": bson.M{"isLogin": false, "lineId": "", "updated_at": time.Now()}}
 	UserCollection.FindOneAndUpdate(context.TODO(), filter, update)
 	return nil
 }

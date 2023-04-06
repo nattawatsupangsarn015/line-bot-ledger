@@ -5,6 +5,6 @@ RUN go mod download
 # RUN go test
 RUN go build -o /docker-gs-ping
 
-EXPOSE 3000
+EXPOSE 7777
 
 CMD [ "/docker-gs-ping" ]

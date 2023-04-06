@@ -68,3 +68,22 @@ func LoginUser(user request.Login, lineId string) (interface{}, error) {
 
 	return findUser, nil
 }
+
+func LogoutUser(lineId string) error {
+	findUser, err := controller.GetUserByLineId(lineId)
+	if err != nil {
+		return err
+	}
+
+	if findUser == nil {
+		return nil
+	}
+
+	err = controller.UpdateLogoutUser(lineId)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
+}

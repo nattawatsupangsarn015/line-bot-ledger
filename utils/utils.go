@@ -21,6 +21,7 @@ import (
 
 func HandleBadRequest(c *gin.Context, structure interface{}) {
 	if err := c.BindJSON(&structure); err != nil {
+		fmt.Println(err)
 		c.JSON(http.StatusBadRequest, responses.Response{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 		return
 	}
@@ -95,9 +96,13 @@ func JwtMiddleware() gin.HandlerFunc {
 	}
 }
 
-func LogWithTypeStruct(data interface{}) {
-	jsonData, _ := json.MarshalIndent(data, "", "    ")
+func LogWithTypeStruct(data interface{}) error {
+	jsonData, err := json.MarshalIndent(data, "", "    ")
+	if err != nil {
+		return err
+	}
 	fmt.Println(string(jsonData))
+	return nil
 }
 
 func ReplyMessageLine(Message model.ReplyMessage) error {
@@ -114,11 +119,12 @@ func ReplyMessageLine(Message model.ReplyMessage) error {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+		log.Println("Err: ", err)
 		return err
 	}
 	defer resp.Body.Close()
 
-	log.Println("response Status:", resp.Status)
+	log.Println("Response Status:", resp.Status)
 	// log.Println("response Headers:", resp.Header)
 	// body, _ := ioutil.ReadAll(resp.Body)
 	// log.Println("response Body:", string(body))
