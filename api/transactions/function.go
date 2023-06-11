@@ -128,7 +128,6 @@ func CreateTransactions(lineId string, transaction model.RequestTransactions) (s
 	}
 
 	convertValueToString := strconv.FormatFloat(value, 'f', -1, 64)
-	fmt.Println(convertValueToString)
 	ciphertext, err := utils.Encrypt(findUser.ID.Hex(), convertValueToString)
 	if err != nil {
 		return "", err
@@ -176,4 +175,71 @@ func CreateTransactions(lineId string, transaction model.RequestTransactions) (s
 	// decryptedString := string(decrypted)
 	// fmt.Println(decryptedString)
 
+}
+
+func GetBalance(lineId string) (string, error) {
+	findUser, err := controller.GetUserByLineId(lineId)
+	if err != nil {
+		return "", err
+	}
+
+	if findUser == nil {
+		return "ขออภัย ระบบไม่สามารถค้นหาข้อมูลของท่านได้\n กรุณาลองออกจากระบบแล้วเข้าสู่ระบบใหม่อีกครั้งครับ 🙇‍♂️", nil
+	}
+
+	var user model.User
+	err = utils.ConvertInterfaceToStruct(findUser, &user)
+	if err != nil {
+		return "", err
+	}
+
+	var incomeTransactions []model.Income
+	rawIncomeTransactions, err := controller.GetAllIncome(user.ID)
+	if err != nil {
+		return "", err
+	}
+
+	err = utils.ConvertInterfaceToStruct(rawIncomeTransactions, &incomeTransactions)
+	if err != nil {
+		return "", err
+	}
+
+	var expenseTransactions []model.Expense
+	rawExpenseTransactions, err := controller.GetAllExpense(user.ID)
+	if err != nil {
+		return "", err
+	}
+
+	err = utils.ConvertInterfaceToStruct(rawExpenseTransactions, &expenseTransactions)
+	if err != nil {
+		return "", err
+	}
+
+	if len(incomeTransactions) == 0 && len(expenseTransactions) == 0 {
+		return "ท่านยังไม่มีการสร้างรายการ 🙇‍♂️\nท่านสามารถพิม \"how-to-use\" เพื่อดูวิธีการใช้งาน", nil
+	}
+
+	var decryptedIncomeTransactions []model.IncomeDecrypt
+	var decryptedExpenseTransactions []model.ExpenseDecrypt
+
+	for _, s := range incomeTransactions {
+		decrypted, err := ConvertTransactionIncome(s)
+		if err != nil {
+			return "", err
+		}
+		decryptedIncomeTransactions = append(decryptedIncomeTransactions, decrypted)
+	}
+
+	for _, s := range expenseTransactions {
+		decrypted, err := ConvertTransactionExpense(s)
+		if err != nil {
+			return "", err
+		}
+		decryptedExpenseTransactions = append(decryptedExpenseTransactions, decrypted)
+	}
+
+	fmt.Println(decryptedIncomeTransactions)
+	fmt.Println(decryptedExpenseTransactions)
+
+	return "OK", nil
 }

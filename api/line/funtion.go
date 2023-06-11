@@ -109,6 +109,7 @@ func StateUserLogin(text string, state model.StateUser, lineId string) (string, 
 	var replyText string
 	var err error
 
+	messageText = strings.ToLower(messageText)
 	switch messageText {
 	case "logout":
 		err = public.LogoutUser(lineId)
@@ -131,6 +132,9 @@ func StateUserLogin(text string, state model.StateUser, lineId string) (string, 
 
 		joinArr := strings.Join(allState[:], "")
 		replyText = "ตอนนี้คำสั่งที่สามารถใช้ได้หลังจากล็อคอินแล้วคือ\n" + joinArr
+		break
+	case "check-balance":
+		replyText, err = transactions.GetBalance(lineId)
 		break
 	default:
 		splitData := strings.Split(messageText, "")
